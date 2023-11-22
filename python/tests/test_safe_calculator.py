@@ -1,7 +1,19 @@
 import pytest
+import sys 
+import pathlib
+sys.path.append(pathlib.Path(__file__).parent.absolute().parent)  
 
+from safe_calculator import SafeCalculator
 
-def test_divide_should_not_raise_any_error_when_authorized():
-    # TODO: write a test that fails due to the bug in
-    # SafeCalculator.add
-    pass
+class AuthorizerStub:
+    def authorize(self):
+        return False
+
+def test_add_should_raise_error_when_not_authorized():
+    authorizer = AuthorizerStub()
+    calculator = SafeCalculator(authorizer)
+
+    with pytest.raises(Exception) as excinfo:
+        calculator.add(5, 7)
+    
+    assert str(excinfo.value) == "Not authorized"
